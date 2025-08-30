@@ -51,9 +51,9 @@ Traffic Data Sources → ML Model (Prediction) → Backend APIs → Database →
 ---
 
 ##  Tech Stack
-- *Frontend:* React.js, TailwindCSS
-- *Backend:* Flask (Python), Node.js    
-- *ML Model:* Python (Scikit-learn, Pandas, NumPy)  
+- *Frontend:* NextJS, React, TailwindCSS, Node.js 
+- *Backend:* FastAPI (Python)    
+- *ML Model:* Python (Pandas, NumPy)  
 
 ---
 
