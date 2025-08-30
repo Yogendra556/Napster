@@ -2,4 +2,4 @@ fastapi
 uvicorn
 matplotlib
 jinja2
-multipart
+python-multipart
