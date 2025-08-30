@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traffic Light Simulator</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-y: auto; /* allow scroll */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* Top area split into left + right */
+  .top {
+    flex: 1;
+    display: flex;
+    min-height: 500px;
+  }
+
+  .left {
+    width: 35%;
+    background: #fff;
+    border-right: 2px solid #ddd;
+    padding: 20px;
+  }
+
+  .lane-detail {
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+    background: #f0f0f0;
+    font-weight: bold;
+    text-align: center;
+    font-size: 16px;
+    transition: background 0.5s;
+  }
+
+  /* Blinking effect for active (green) lane */
+  .active-blink {
+    animation: blink 1s infinite;
+    background: #c8f7c5 !important;
+    border: 2px solid green;
+  }
+
+  @keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0.4; }
+  }
+
+  .right {
+    flex: 1;
+    display: flex;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .right-left {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .right-left > div {
+    flex: 1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  .right-right {
+    flex: 1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  .bottom {
+    flex: 0 0 auto;
+    background: #fff;
+    border-top: 2px solid #ddd;
+    padding: 15px;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+  }
+
+  form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .lane-card {
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .lane-card h4 {
+    margin: 0 0 8px 0;
+    color: #555;
+  }
+
+  input[type="number"] {
+    width: 60px;
+    padding: 4px;
+    margin: 4px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  button {
+    grid-column: 1/-1;
+    padding: 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+  }
+
+  th {
+    background: #007bff;
+    color: white;
+  }
+
+  .lane {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .light {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-left: 10px;
+    background: red;
+    transition: background 0.5s;
+  }
+
+  .green {
+    background: green !important;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Top content -->
+  <div class="top">
+    <!-- Left details -->
+    <div class="left">
+      <h3>Lane Details</h3>
+      <div class="lane-detail" id="detailN">North Lane</div>
+      <div class="lane-detail" id="detailE">East Lane</div>
+      <div class="lane-detail" id="detailS">South Lane</div>
+      <div class="lane-detail" id="detailW">West Lane</div>
+    </div>
+
+    <div class="right">
+      <div class="right-left">
+        <div>
+          <h3>Traffic Allocation Graph</h3>
+          {% if graph %}
+          <img src="data:image/png;base64,{{graph}}" alt="Traffic Graph">
+          {% endif %}
+        </div>
+        <div>
+          <h3>Live Traffic Light Animation</h3>
+          <div class="lane">North <span class="light" id="lightN"></span></div>
+          <div class="lane">East <span class="light" id="lightE"></span></div>
+          <div class="lane">South <span class="light" id="lightS"></span></div>
+          <div class="lane">West <span class="light" id="lightW"></span></div>
+        </div>
+      </div>
+
+      <div class="right-right">
+        <h3>Simulation Report</h3>
+        {% if timeline %}
+        <table>
+          <tr>
+            <th>Lane</th>
+            <th>Vehicles</th>
+            <th>Green Time (s)</th>
+          </tr>
+          {% for phase in timeline %}
+          <tr>
+            <td>{{ phase.lane_status.keys()|list|join(', ') }}</td>
+            <td>
+              {% for v, c in phase.vehicles.items() %}
+                {{v}}: {{c}}<br>
+              {% endfor %}
+            </td>
+            <td>{{ phase.green_time }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom form -->
+  <div class="bottom">
+    <form method="post" action="/simulate">
+      <div class="lane-card">
+        <h4>North Lane</h4>
+        Emergency: <input type="number" name="N_emergency" value="0"><br>
+        Bus: <input type="number" name="N_bus" value="0"><br>
+        Car: <input type="number" name="N_car" value="0"><br>
+        Bike: <input type="number" name="N_bike" value="0">
+      </div>
+      <div class="lane-card">
+        <h4>East Lane</h4>
+        Emergency: <input type="number" name="E_emergency" value="0"><br>
+        Bus: <input type="number" name="E_bus" value="0"><br>
+        Car: <input type="number" name="E_car" value="0"><br>
+        Bike: <input type="number" name="E_bike" value="0">
+      </div>
+      <div class="lane-card">
+        <h4>South Lane</h4>
+        Emergency: <input type="number" name="S_emergency" value="0"><br>
+        Bus: <input type="number" name="S_bus" value="0"><br>
+        Car: <input type="number" name="S_car" value="0"><br>
+        Bike: <input type="number" name="S_bike" value="0">
+      </div>
+      <div class="lane-card">
+        <h4>West Lane</h4>
+        Emergency: <input type="number" name="W_emergency" value="0"><br>
+        Bus: <input type="number" name="W_bus" value="0"><br>
+        Car: <input type="number" name="W_car" value="0"><br>
+        Bike: <input type="number" name="W_bike" value="0">
+      </div>
+      <button type="submit">Simulate</button>
+    </form>
+  </div>
+</div>
+
+{% if timeline %}
+<script>
+const timeline = {{ timeline|tojson }};
+const lights = { "N": "lightN", "E": "lightE", "S": "lightS", "W": "lightW" };
+const details = { "N": "detailN", "E": "detailE", "S": "detailS", "W": "detailW" };
+
+async function animateTraffic() {
+    for (let phase of timeline) {
+        // Reset all lights + details
+        for (let l in lights) {
+            document.getElementById(lights[l]).className = "light";
+            document.getElementById(details[l]).classList.remove("active-blink");
+        }
+        // Set current green
+        for (let lane in phase.lane_status) {
+            if (phase.lane_status[lane] === "GREEN") {
+                document.getElementById(lights[lane]).className = "light green";
+                document.getElementById(details[lane]).classList.add("active-blink");
+            }
+        }
+        // Wait
+        await new Promise(r => setTimeout(r, phase.green_time*1000));
+    }
+    // Reset all at end
+    for (let l in lights) {
+        document.getElementById(lights[l]).className = "light";
+        document.getElementById(details[l]).classList.remove("active-blink");
+    }
+}
+animateTraffic();
+</script>
+{% endif %}
+
+</body>
+</html>

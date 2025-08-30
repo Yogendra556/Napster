@@ -36,7 +36,7 @@ export default function Hero(){
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
             <button className="group bg-gradient-to-r from-[#F5F5DC] to-white text-black px-8 py-4 rounded-full font-semibold text-lg hover:shadow-2xl hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
-              <span>Explore Solution</span>
+              <span><a href="http://127.0.0.1:8000">Explore Solution</a></span>
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
             </button>
           </div>

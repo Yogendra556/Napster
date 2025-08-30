@@ -7,25 +7,25 @@ const Features = () => {
     {
       icon: Map,
       title: "Real-Time Traffic Visualization",
-      description: "Interactive maps with color-coded roads showing live traffic conditions across the city.",
+      description: "Color-coded signals showing live traffic conditions across the city.",
       color: "from-blue-500 to-cyan-400"
     },
     {
       icon: TrendingUp,
-      title: "ML-based Congestion Prediction",
-      description: "Forecasts jams 10-15 mins in advance using traffic density, time, and incidents data.",
+      title: "ML-based allocation of signal time",
+      description: "Time allocated to green signal for respective lanes are calculated through ML algorithm.",
       color: "from-purple-500 to-pink-400"
     },
     {
       icon: BarChart3,
-      title: "Heatmaps & Alerts",
-      description: "City-wide heatmaps highlight congestion hotspots and trigger real-time alerts.",
+      title: "Graphs",
+      description: "Graph depicts how much time is allocated to individual lane for green signal.",
       color: "from-orange-500 to-red-400"
     },
     {
       icon: Truck,
       title: "Emergency Vehicle Priority",
-      description: "Detects ambulance/police/fire trucks and automatically creates green corridors.",
+      description: "Detects ambulance/police/fire trucks and increases the time for green signal for each lane.",
       color: "from-green-500 to-emerald-400"
     }
   ];
@@ -40,8 +40,9 @@ const Features = () => {
             Our Harri_Batti transforms how cities manage traffic flow
           </p>
         </div>
-        
+      
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  
           {features.map((feature, index) => (
             <div
               key={index}
@@ -60,8 +61,6 @@ const Features = () => {
               </p>
               
               <div className="mt-6 flex items-center text-cyan-400 group-hover:text-cyan-300 transition-colors duration-300">
-                <span className="text-sm font-medium">Learn more</span>
-                <Eye className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
               </div>
             </div>
           ))}
